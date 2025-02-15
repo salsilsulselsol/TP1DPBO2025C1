@@ -5,7 +5,7 @@ Saya Faisal Nur Qolbi dengan NIM 2311399 mengerjakan Tugas Praktikum 1 dalam mat
 # Desain Program
 Terdiri dari 1 class yaitu petshop yang memiliki inner class Menu. Class petshop berisi data peralatan/barang petshop yaitu id, nama, kategori, harga, dan stok. Class Menu sebagai inner class dari class petshop berisi method CRUD & Search untuk data petshop.
 # Alur Program
-Pertama akan muncul menu dengan input pilihan dari 1-6 dimana:
+Program akan menampilkan menu dengan input pilihan dari 1-6 dimana:
 1. Create/Add/Tambah data peralatan
 2. Menampilkan semua data peralatan
 3. Mengubah/Mengedit data peralatan berdasarkan id
