@@ -12,4 +12,5 @@ Pertama akan muncul menu dengan input pilihan dari 1-6 dimana:
 4. Menghapus data berdasarkan id
 5. Mencari data berdasarkan nama peralatan dan menampilkannya
 6. Keluar menu
+
 Menu akan terus meminta masukan selama bukan pilihan 6 alias keluar menu
