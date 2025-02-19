@@ -1,9 +1,7 @@
 import java.util.Scanner;
 
-// Class Main untuk menjalankan program
 public class Main {
     public static void main(String[] args) {
-        Petshop.Menu menu = new Petshop.Menu();
         Scanner scanner = new Scanner(System.in);
         int pilihan = 0;
 
@@ -19,13 +17,13 @@ public class Main {
             System.out.print("Pilih: ");
             pilihan = scanner.nextInt();
 
-            // Switch case untuk memproses pilihan user
+            // Switch case untuk memproses pilihan user (pake rule switch kata debugger java-nya)
             switch (pilihan) {
-                case 1 -> menu.create();
-                case 2 -> menu.print();
-                case 3 -> menu.update();
-                case 4 -> menu.delete();
-                case 5 -> menu.search();
+                case 1 -> Petshop.create();
+                case 2 -> Petshop.print();
+                case 3 -> Petshop.update();
+                case 4 -> Petshop.delete();
+                case 5 -> Petshop.search();
                 case 6 -> System.out.println("Keluar dari program.");
                 default -> System.out.println("Pilihan tidak valid. Silakan coba lagi.");
             }
