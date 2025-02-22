@@ -9,36 +9,80 @@ if (!isset($_SESSION['petshop'])) {
 }
 $petshop = $_SESSION['petshop'];
 
+// Fungsi untuk memvalidasi dan mengupload gambar
+function handleImageUpload($existingPath = null) {
+    if (isset($_FILES['foto']) && $_FILES['foto']['error'] == UPLOAD_ERR_OK) {
+        $targetDir = "uploads/";
+        if (!is_dir($targetDir)) mkdir($targetDir, 0755, true);
+        
+        // Validasi tipe file
+        $allowed = ['jpg', 'jpeg', 'png', 'gif'];
+        $fileName = $_FILES['foto']['name'];
+        $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        
+        if (!in_array($fileExt, $allowed)) {
+            die("Hanya file gambar yang diperbolehkan!");
+        }
+
+        // Generate nama unik
+        $newFileName = uniqid() . "." . $fileExt;
+        $targetPath = $targetDir . $newFileName;
+
+        // Hapus gambar lama jika ada
+        if ($existingPath && file_exists($existingPath)) {
+            unlink($existingPath);
+        }
+
+        if (move_uploaded_file($_FILES['foto']['tmp_name'], $targetPath)) {
+            return $targetPath;
+        }
+    }
+    return $existingPath; // Kembalikan path lama jika tidak ada upload baru
+}
+
 // Menangani permintaan POST untuk operasi CRUD
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['aksi'])) {
         switch ($_POST['aksi']) {
             case 'tambah':
-                // Menambahkan produk baru dengan data dari form
+                $imagePath = handleImageUpload();
                 $petshop->tambahProduk(
                     (int)$_POST['id'],
                     $_POST['nama'],
                     $_POST['kategori'],
                     (int)$_POST['harga'],
                     (int)$_POST['stok'],
-                    $_POST['urlFoto']
+                    $imagePath
                 );
                 break;
+            
             case 'ubah':
-                // Mengubah data produk yang sudah ada
+                $produk = $petshop->cariProduk((int)$_POST['id']);
+                $existingImage = $produk['urlFoto'] ?? null;
+                $imagePath = handleImageUpload($existingImage);
+                
                 $petshop->ubahDataProduk(
                     (int)$_POST['id'],
                     $_POST['nama'],
                     $_POST['kategori'],
                     (int)$_POST['harga'],
                     (int)$_POST['stok'],
-                    $_POST['urlFoto']
+                    $imagePath
                 );
                 break;
-            case 'hapus':
-                // Menghapus produk berdasarkan ID
-                $petshop->hapusDataProduk((int)$_POST['id']);
-                break;
+            
+                case 'hapus':
+                    $id = (int)$_POST['id'];
+                    $produk = $petshop->cariProduk($id);
+
+                    if (is_array($produk) && isset($produk['urlFoto'])) {
+                        $filePath = $produk['urlFoto'];
+                        if (is_string($filePath) && !empty($filePath) && file_exists($filePath)) {
+                            unlink($filePath);
+                        }
+                    }
+                    $petshop->hapusDataProduk($id);
+                    break;
         }
     }
 }
@@ -185,7 +229,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="modal-konten">
                 <span class="tutup" onclick="tutupModal('modalTambah')">&times;</span>
                 <h2>Tambah Produk Baru</h2>
-                <form method="post">
+                <form method="post" enctype="multipart/form-data">
                     <input type="hidden" name="aksi" value="tambah">
                     <div class="grup-form">
                         <label>ID:</label>
@@ -208,8 +252,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <input type="number" name="stok" required>
                     </div>
                     <div class="grup-form">
-                        <label>URL Foto:</label>
-                        <input type="text" name="urlFoto" required>
+                        <label>Foto:</label>
+                        <input type="file" name="foto" accept="image/*" required>
                     </div>
                     <button type="submit" class="tombol tombol-utama">Tambah</button>
                 </form>
@@ -221,7 +265,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="modal-konten">
                 <span class="tutup" onclick="tutupModal('modalUbah')">&times;</span>
                 <h2>Ubah Produk</h2>
-                <form method="post">
+                <form method="post" enctype="multipart/form-data">
                     <input type="hidden" name="aksi" value="ubah">
                     <div class="grup-form">
                         <label>ID:</label>
@@ -244,8 +288,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <input type="number" name="stok" required>
                     </div>
                     <div class="grup-form">
-                        <label>URL Foto Baru:</label>
-                        <input type="text" name="urlFoto" required>
+                        <label>Foto Baru:</label>
+                        <input type="file" name="foto" accept="image/*" required>
                     </div>
                     <button type="submit" class="tombol tombol-ubah">Perbarui</button>
                 </form>
